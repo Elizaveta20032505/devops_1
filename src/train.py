@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import configparser
+import json
 from pathlib import Path
 
 import joblib
@@ -26,7 +27,9 @@ def main() -> None:
     path = _root() / cfg["PATHS"]["model_path"]
     path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, path)
-    print("Готово:", path)
+    names_path = path.parent / "feature_names.json"
+    names_path.write_text(json.dumps(list(X_train.columns), ensure_ascii=False), encoding="utf-8")
+    print("Готово:", path, names_path)
 
 
 if __name__ == "__main__":

@@ -12,3 +12,4 @@ htmlcov/
 data/raw/*.csv
 data/processed/*.csv
 experiments/*.joblib
+experiments/*.json
