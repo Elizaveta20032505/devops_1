@@ -1,5 +1,8 @@
 FROM python:3.12-slim-bookworm
 
+LABEL org.opencontainers.image.title="devops1-breast-cancer-api"
+LABEL org.opencontainers.image.description="FastAPI + логрег"
+
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \

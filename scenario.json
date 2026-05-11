@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "description": "Сценарии проверки поднятого контейнера API. SCENARIO_BASE_URL — при необходимости.",
+  "default_base_url": "http://127.0.0.1:8000",
+  "steps": [
+    {
+      "id": "health",
+      "method": "GET",
+      "path": "/health",
+      "expect_status": 200
+    },
+    {
+      "id": "openapi",
+      "method": "GET",
+      "path": "/openapi.json",
+      "expect_status": 200
+    },
+    {
+      "id": "predict_zeros",
+      "method": "POST",
+      "path": "/predict",
+      "body_template": "zeros_from_feature_names",
+      "expect_status_in": [200, 503],
+      "comment": "200 если модель в образе; 503 если нет model.joblib."
+    }
+  ]
+}

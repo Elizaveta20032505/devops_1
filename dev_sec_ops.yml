@@ -1,0 +1,19 @@
+version: 1
+
+docker:
+  image_repository_tag: devops1-api:latest
+  image_digest: ""
+  dockerfile: Dockerfile
+
+git:
+  branch: main
+  last_5_commit_hashes:
+    - 41ef35f530eaefa1dfbd0cec60f0c9ec14b17242
+    - 1b321888b0916aa06d6a4e1b8545fe089a2a2379
+    - 0f0ece0441be03ef6bb5334f1e9e1f320f42990b
+    - 46fa49ea7f85ecfc8b3023dba43b2491de252188
+    - 981fdf9bcccbd41b7c8b6981eda1d60a435cc33f
+
+quality:
+  pytest_coverage_src_total_percent: 44
+  pytest_command: pytest --cov=src --cov-report=term-missing

@@ -22,7 +22,13 @@ def main() -> None:
     X_train = pd.read_csv(d / "Train_X.csv")
     y_train = pd.read_csv(d / "Train_y.csv")["target"]
 
-    model = LogisticRegression(max_iter=5000).fit(X_train, y_train)
+    lr = cfg["LOG_REG"]
+    model = LogisticRegression(
+        C=float(lr["C"]),
+        max_iter=int(lr["max_iter"]),
+        solver=lr["solver"].strip(),
+        random_state=int(lr["random_state"]),
+    ).fit(X_train, y_train)
 
     path = _root() / cfg["PATHS"]["model_path"]
     path.parent.mkdir(parents=True, exist_ok=True)
