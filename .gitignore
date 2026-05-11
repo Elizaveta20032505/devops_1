@@ -9,7 +9,4 @@ venv/
 .coverage
 htmlcov/
 
-data/raw/*.csv
-data/processed/*.csv
-experiments/*.joblib
-experiments/*.json
+# data/raw/data.csv и артефакты стадий — в .gitignore дописывает DVC (см. dvc.yaml / *.dvc)

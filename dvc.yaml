@@ -1,0 +1,21 @@
+stages:
+  prepare_data:
+    cmd: python -m src.prepare_data
+    deps:
+      - src/prepare_data.py
+      - src/__init__.py
+      - config.ini
+      - data/raw/data.csv
+    outs:
+      - data/processed
+
+  train:
+    cmd: python -m src.train
+    deps:
+      - src/train.py
+      - src/__init__.py
+      - config.ini
+      - data/processed
+    outs:
+      - experiments/model.joblib
+      - experiments/feature_names.json
