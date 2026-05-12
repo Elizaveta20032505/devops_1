@@ -38,8 +38,15 @@ pipeline {
                 expression { env.CHANGE_ID != null && env.CHANGE_TARGET == 'main' }
             }
             steps {
-                sh 'docker --version'
-                sh "docker build -t ${IMAGE}:${TAG} ."
+                script {
+                    if (isUnix()) {
+                        sh 'docker --version'
+                        sh "docker build -t ${IMAGE}:${TAG} ."
+                    } else {
+                        bat 'docker --version'
+                        bat "docker build -t ${IMAGE}:${TAG} ."
+                    }
+                }
             }
         }
 
@@ -55,11 +62,19 @@ pipeline {
                         passwordVariable: 'DH_PASS'
                     )
                 ]) {
-                    sh '''
-                        set -e
-                        echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
-                    '''
-                    sh "docker push ${IMAGE}:${TAG}"
+                    script {
+                        if (isUnix()) {
+                            sh '''
+                                set -e
+                                echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+                            '''
+                            sh "docker push ${IMAGE}:${TAG}"
+                        } else {
+                            // Windows: нет sh; пароль не подставляем в строку Groovy — только env в cmd.
+                            bat 'echo %DH_PASS%| docker login -u %DH_USER% --password-stdin'
+                            bat "docker push ${IMAGE}:${TAG}"
+                        }
+                    }
                 }
             }
         }

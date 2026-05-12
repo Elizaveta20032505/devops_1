@@ -26,45 +26,84 @@ pipeline {
 
         stage('docker_pull') {
             steps {
-                sh 'docker --version'
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'dockerhub-creds',
-                        usernameVariable: 'DH_USER',
-                        passwordVariable: 'DH_PASS'
-                    )
-                ]) {
-                    sh '''
-                        set -e
-                        echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
-                    '''
+                script {
+                    if (isUnix()) {
+                        sh 'docker --version'
+                        withCredentials([
+                            usernamePassword(
+                                credentialsId: 'dockerhub-creds',
+                                usernameVariable: 'DH_USER',
+                                passwordVariable: 'DH_PASS'
+                            )
+                        ]) {
+                            sh '''
+                                set -e
+                                echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+                            '''
+                        }
+                        sh "docker pull ${IMAGE}:${params.IMAGE_TAG}"
+                    } else {
+                        bat 'docker --version'
+                        withCredentials([
+                            usernamePassword(
+                                credentialsId: 'dockerhub-creds',
+                                usernameVariable: 'DH_USER',
+                                passwordVariable: 'DH_PASS'
+                            )
+                        ]) {
+                            bat 'echo %DH_PASS%| docker login -u %DH_USER% --password-stdin'
+                        }
+                        bat "docker pull ${IMAGE}:${params.IMAGE_TAG}"
+                    }
                 }
-                sh "docker pull ${IMAGE}:${params.IMAGE_TAG}"
             }
         }
 
         stage('docker_run') {
             steps {
-                sh "docker rm -f ${CNAME} 2>/dev/null || true"
-                sh "docker run -d --name ${CNAME} -p ${HOST_PORT}:8000 ${IMAGE}:${params.IMAGE_TAG}"
-                sh 'sleep 20'
+                script {
+                    if (isUnix()) {
+                        sh "docker rm -f ${CNAME} 2>/dev/null || true"
+                        sh "docker run -d --name ${CNAME} -p ${HOST_PORT}:8000 ${IMAGE}:${params.IMAGE_TAG}"
+                        sh 'sleep 20'
+                    } else {
+                        bat returnStatus: true, script: "docker rm -f ${CNAME}"
+                        bat "docker run -d --name ${CNAME} -p ${HOST_PORT}:8000 ${IMAGE}:${params.IMAGE_TAG}"
+                        bat 'powershell -NoProfile -Command "Start-Sleep -Seconds 20"'
+                    }
+                }
             }
         }
 
         stage('functional_scenarios') {
             steps {
-                sh '''
-                    set -e
-                    export SCENARIO_BASE_URL="http://127.0.0.1:18080"
-                    python3 scripts/run_scenarios.py || python scripts/run_scenarios.py
-                '''
+                script {
+                    if (isUnix()) {
+                        sh '''
+                            set -e
+                            export SCENARIO_BASE_URL="http://127.0.0.1:18080"
+                            python3 scripts/run_scenarios.py || python scripts/run_scenarios.py
+                        '''
+                    } else {
+                        bat '''
+                            set SCENARIO_BASE_URL=http://127.0.0.1:18080
+                            python scripts\\run_scenarios.py
+                        '''
+                    }
+                }
             }
         }
     }
 
     post {
         always {
-            sh "docker rm -f cd-api-${env.BUILD_NUMBER} 2>/dev/null || true"
+            script {
+                if (isUnix()) {
+                    sh "docker rm -f cd-api-${env.BUILD_NUMBER} 2>/dev/null || true"
+                } else {
+                    bat returnStatus: true, script: "docker rm -f cd-api-${env.BUILD_NUMBER}"
+                }
+            }
         }
         failure {
             echo 'Проверь: docker на агенте, тег IMAGE_TAG на Hub, порт 18080 свободен, в образе есть модель (иначе /health no_model, сценарии частично ок).'
