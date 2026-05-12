@@ -1,2 +1,3 @@
 /model.joblib
+# feature_names.json — маленький JSON, коммитим в git, чтобы CD/run_scenarios.py видел имена признаков.
 /feature_names.json

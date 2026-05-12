@@ -5,8 +5,8 @@ stages:
     deps:
     - path: config.ini
       hash: md5
-      md5: c8fdcaca29dfd96348ee6f4fbbb91d01
-      size: 156
+      md5: a1abcbc9eaf2b92725aff3d2b7a88e45
+      size: 230
     - path: data/raw/data.csv
       hash: md5
       md5: 6165d90b8708bb1c1dd14245cc6bef46
@@ -30,8 +30,8 @@ stages:
     deps:
     - path: config.ini
       hash: md5
-      md5: c8fdcaca29dfd96348ee6f4fbbb91d01
-      size: 156
+      md5: a1abcbc9eaf2b92725aff3d2b7a88e45
+      size: 230
     - path: data/processed
       hash: md5
       md5: 638b5c1a4d985e6d11c5cdfede06f8c2.dir
@@ -43,8 +43,8 @@ stages:
       size: 0
     - path: src/train.py
       hash: md5
-      md5: b352cf59678b0e2fa3827082a59eacb7
-      size: 1128
+      md5: 1e1ce0de1ddb5530df16b0751ac05392
+      size: 1297
     outs:
     - path: experiments/feature_names.json
       hash: md5
@@ -52,5 +52,5 @@ stages:
       size: 545
     - path: experiments/model.joblib
       hash: md5
-      md5: 6e0a14e8df2a928cfa3806e5ca318328
+      md5: cc27c558d7539d4ee171ac2965494d5f
       size: 2031

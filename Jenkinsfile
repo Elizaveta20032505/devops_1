@@ -1,6 +1,6 @@
-// CI: Docker build + push to Docker Hub on pull request targeting branch "main".
-// Jenkins: Multibranch Pipeline + GitHub, agent with Docker CLI.
-// Create credential "dockerhub-creds" (username + Access Token from hub.docker.com).
+// CI: pytest → Docker build + push (PR в main). Агент: Docker CLI + Python 3 (venv .ci-venv).
+// Jenkins: Multibranch Pipeline + GitHub.
+// Credential dockerhub-creds (username + Access Token с hub.docker.com).
 
 pipeline {
     agent any
@@ -30,6 +30,32 @@ pipeline {
             }
             steps {
                 checkout scm
+            }
+        }
+
+        stage('pytest') {
+            when {
+                expression { env.CHANGE_ID != null && env.CHANGE_TARGET == 'main' }
+            }
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh '''
+                            set -e
+                            python -m venv .ci-venv
+                            . .ci-venv/bin/activate
+                            pip install -q -r requirements.txt
+                            pytest -q
+                        '''
+                    } else {
+                        bat '''
+                            python -m venv .ci-venv
+                            call .ci-venv/Scripts/activate.bat
+                            python -m pip install -q -r requirements.txt
+                            python -m pytest -q
+                        '''
+                    }
+                }
             }
         }
 
@@ -90,7 +116,7 @@ pipeline {
             }
         }
         failure {
-            echo 'Check logs; ensure credential ID dockerhub-creds (Docker Hub access token) and DOCKERHUB_USER match the image name.'
+            echo 'Проверь: pytest (стадия pytest), dockerhub-creds, DOCKERHUB_USER, логи docker push.'
         }
     }
 }
